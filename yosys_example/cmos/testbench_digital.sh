@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /opt/oss-cad-suite/environment
+
 set -ex
 
 # iverlog simulation
@@ -8,7 +10,7 @@ iverilog -o counter_tb counter.v counter_tb.v
 ./counter_tb; gtkwave counter_tb.gtkw &
 
 # yosys synthesis
-../../yosys counter_digital.ys
+yosys counter_digital.ys
 
 # requires ngspice with xspice support enabled:
 ngspice testbench_digital.sp
