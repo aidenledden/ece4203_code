@@ -51,7 +51,7 @@ PERIODS := 2 4 6 10
 # Derived file lists
 # ---------------------------------------------------------------
 NETLISTS := $(foreach W,$(WIDTHS),results/netlist_$(W).v)
-STA_LOGS := $(foreach W,$(WIDTHS),$(foreach P,$(PERIODS),results/sta_w$(W)_p$(P).log))
+STA_LOGS := $(foreach W,$(WIDTHS),$(foreach P,$(PERIODS),results/sta_w$(W)p$(P).log))
 
 # ---------------------------------------------------------------
 # Default
@@ -98,15 +98,16 @@ sta: $(STA_LOGS)
 
 # Substitute __WIDTH__ and __PERIOD__ tokens into the SDC template.
 # Pattern: constraints_w<WIDTH>p<PERIOD>.sdc
-results/constraints_w%p%.sdc: synth/constraints.sdc.template | results/
-	$(eval _W := $(firstword $(subst p, ,$*)))
-	$(eval _P := $(lastword  $(subst p, ,$*)))
+
+results/constraints_w%.sdc: synth/constraints.sdc.template | results/
+	$(eval _W := $(word 1,$(subst p, ,$*)))
+	$(eval _P := $(word 2,$(subst p, ,$*)))
 	sed -e 's/__WIDTH__/$(_W)/g' -e 's/__PERIOD__/$(_P)/g' $< > $@
 
 # Substitute tokens into the OpenSTA script template.
-results/sta_w%p%.tcl: synth/sta.tcl.template | results/
-	$(eval _W := $(firstword $(subst p, ,$*)))
-	$(eval _P := $(lastword  $(subst p, ,$*)))
+results/sta_w%.tcl: synth/sta.tcl.template | results/
+	$(eval _W := $(word 1,$(subst p, ,$*)))
+	$(eval _P := $(word 2,$(subst p, ,$*)))
 	sed \
 	    -e 's|__LIBERTY__|$(LIBERTY)|g' \
 	    -e 's/__WIDTH__/$(_W)/g' \
@@ -114,7 +115,7 @@ results/sta_w%p%.tcl: synth/sta.tcl.template | results/
 	    $< > $@
 
 define STA_RULE
-results/sta_w$(1)_p$(2).log: \
+results/sta_w$(1)p$(2).log: \
         results/netlist_$(1).v \
         results/constraints_w$(1)p$(2).sdc \
         results/sta_w$(1)p$(2).tcl | results/
@@ -144,7 +145,7 @@ sim_gl: results/netlist_$(WIDTH).v results/netlist_$(WIDTH).sdf
 	    echo "       Check SKY130_CELLS in Makefile and adjust path."; \
 	    exit 1; \
 	fi
-	$(IVERILOG) -g2012 \
+	$(IVERILOG) -g2012 -gspecify -ginterconnect \
 	    -D WIDTH=$(WIDTH) \
 	    -D SDF_FILE=\"results/netlist_$(WIDTH).sdf\" \
 	    -D VCD_FILE=\"results/gl_$(WIDTH).vcd\" \
@@ -153,7 +154,7 @@ sim_gl: results/netlist_$(WIDTH).v results/netlist_$(WIDTH).sdf
 	    results/netlist_$(WIDTH).v \
 	    $(SKY130_CELLS)/sky130_fd_sc_hd.v \
 	    $(SKY130_CELLS)/primitives.v
-	$(VVP) -M. results/sim_gl_$(WIDTH)_exe | tee results/sim_gl_$(WIDTH).log
+	$(VVP) -M. results/sim_gl_$(WIDTH)_exe +sdfmax+tb_gl.dut | tee results/sim_gl_$(WIDTH).log
 	@echo ""
 	@echo "Waveform written to results/gl_$(WIDTH).vcd"
 	@echo "Open with:  gtkwave results/gl_$(WIDTH).vcd &"
@@ -208,7 +209,7 @@ summary:
 results/:
 	mkdir -p $@
 
-.PRECIOUS: results/constraints_w%p%.sdc results/sta_w%p%.tcl
+.PRECIOUS: results/constraints_w%.sdc results/sta_w%.tcl
 
 .PHONY: clean
 clean:

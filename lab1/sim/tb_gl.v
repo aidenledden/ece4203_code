@@ -41,7 +41,7 @@ module tb_gl;
     wire             cout;
 
     // ---- DUT: gate-level netlist ----
-    registered_adder #(.WIDTH(WIDTH)) dut (
+    registered_adder dut (
         .clk(clk), .rst_n(rst_n),
         .a(a), .b(b), .cin(cin),
         .sum(sum), .cout(cout)

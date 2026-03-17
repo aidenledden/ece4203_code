@@ -60219,7 +60219,6 @@ endmodule
 `default_nettype wire
 `endif  // SKY130_FD_SC_HD__DLYMETAL6S6S_1_V
 
-
 //--------EOF---------
 
 /**
@@ -71643,9 +71642,9 @@ module sky130_fd_sc_hd__lpflow_bleeder_1 (
 
     input SHORT;
 
-specify
-(SHORT => VPWR) = (0:0:0,0:0:0,0:0:0,0:0:0,0:0:0,0:0:0);
-endspecify
+//specify
+//(SHORT => VPWR) = (0:0:0,0:0:0,0:0:0,0:0:0,0:0:0,0:0:0);
+//endspecify
 endmodule
 `endcelldefine
 
