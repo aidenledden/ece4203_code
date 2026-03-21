@@ -37,10 +37,23 @@ dfflibmap -liberty $::env(LIBERTY)
 
 # ---- Combinational technology mapping ----
 # -D <ps> sets the target combinational delay budget.
-# ABC will try to meet this target by selecting appropriate cell
-# sizes and logic structures.  Students can observe the effect by
-# comparing netlists synthesised at different periods.
-abc -liberty $::env(LIBERTY) -D $::env(ABC_PERIOD_PS)
+#read_liberty -lib $::env(LIBERTY)
+#abc9 -D $::env(ABC_PERIOD_PS)
+
+# map -D <ps>   : technology map with delay target
+# upsize -D <ps>: promote undersized cells on critical paths
+# dnsize -D <ps>: demote oversized cells with positive slack
+# stime         : print arrival times to log (visible in yosys_W_P.log)
+# Write ABC script to a temp file to avoid quoting/escaping issues
+set abc_script_file "/tmp/abc_[pid].abc"
+set f [open $abc_script_file w]
+puts $f "map -D $::env(ABC_PERIOD_PS)"
+puts $f "upsize -D $::env(ABC_PERIOD_PS)"
+puts $f "dnsize -D $::env(ABC_PERIOD_PS)"
+puts $f "stime"
+close $f
+
+abc -liberty $::env(LIBERTY) -script $abc_script_file
 
 # ---- Area / cell report ----
 # Captured to results/yosys_<WIDTH>_<PERIOD>.log by the -l flag.

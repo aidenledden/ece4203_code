@@ -30,23 +30,23 @@ PYTHON   := python3
 # sky130hd paths
 # ---------------------------------------------------------------
 # Liberty file — typical corner, 25 °C, 1.8 V
-LIBERTY := /OpenROAD-flow-scripts/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
+#LIBERTY := /OpenROAD-flow-scripts/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+LIBERTY := ../pdk/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 # sky130 gate-level Verilog models (needed for gate-level simulation).
 # These ship with the PDK inside OSS CAD Suite.
 # Adjust if your container mounts the PDK elsewhere.
-SKY130_CELLS := /workspaces/ece4203_code/pdk/sky130_fd_sc_hd/verilog
-
+#SKY130_CELLS := /workspaces/ece4203_code/pdk/sky130_fd_sc_hd/verilog
+SKY130_CELLS := ../pdk/sky130_fd_sc_hd/verilog
 # ---------------------------------------------------------------
 # Sweep parameters
 # ---------------------------------------------------------------
-WIDTHS  := 4 8 16 32 64
+WIDTHS  := 8 16 32 64
 
 # Clock periods (ns) for STA.
 # sky130hd typical adder carry-chain delays (no interconnect):
 #   W=4 ~1ns  W=8 ~2ns  W=16 ~3.5ns  W=32 ~6ns  W=64 ~11ns
 # These periods give a spread of PASS / MARGINAL / FAIL:
-PERIODS := 2 4 6 10
+PERIODS := 1 4 16
 
 # sky130hd FF setup time subtracted from the period to give ABC
 # the combinational-only budget (ABC -D flag is in picoseconds).
@@ -143,7 +143,7 @@ $(foreach W,$(WIDTHS),$(foreach P,$(PERIODS),$(eval $(call STA_RULE,$(W),$(P))))
 #   - sky130 Verilog cell models at $(SKY130_CELLS)
 # ---------------------------------------------------------------
 WIDTH ?= 8
-PERIOD ?= 4.0
+PERIOD ?= 4
 
 #.PHONY: sim_gl
 #sim_gl: results/netlist_$(WIDTH).v results/netlist_$(WIDTH).sdf
