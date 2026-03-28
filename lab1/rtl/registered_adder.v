@@ -36,7 +36,8 @@ module registered_adder #(
     input  wire [WIDTH-1:0]  b,
     input  wire              cin,
     output reg  [WIDTH-1:0]  sum,
-    output reg               cout
+    output reg               cout,
+    output wire [WIDTH:0]    result // for probing
 );
 
     // -------------------------------------------------------
@@ -48,7 +49,7 @@ module registered_adder #(
     reg  [WIDTH-1:0] a_r, b_r;
     reg              cin_r;
 
-    always @(posedge clk) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             a_r   <= {WIDTH{1'b0}};
             b_r   <= {WIDTH{1'b0}};
@@ -65,14 +66,14 @@ module registered_adder #(
     // Operates on the registered inputs a_r, b_r, cin_r.
     // The extra bit on result captures carry-out.
     // -------------------------------------------------------
-    (* keep *) wire [WIDTH:0] result;
+
     assign result = {1'b0, a_r} + {1'b0, b_r} + {{WIDTH{1'b0}}, cin_r};
 
     // -------------------------------------------------------
     // Stage 2 — Output registers
     // Capture the combinational result on the next rising edge.
     // -------------------------------------------------------
-    always @(posedge clk) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             sum  <= {WIDTH{1'b0}};
             cout <= 1'b0;

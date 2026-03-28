@@ -56,7 +56,8 @@ module tb_gl;
       .b(b),
       .cin(cin),
       .sum(sum),
-      .cout(cout)
+      .cout(cout),
+      .result()
   );
 
   // ---- SDF back-annotation ----

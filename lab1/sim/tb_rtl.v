@@ -28,7 +28,7 @@ module tb_registered_adder;
     registered_adder #(.WIDTH(WIDTH)) dut (
         .clk(clk), .rst_n(rst_n),
         .a(a), .b(b), .cin(cin),
-        .sum(sum), .cout(cout)
+        .sum(sum), .cout(cout), .result()
     );
 
     // ---- Clock ----
